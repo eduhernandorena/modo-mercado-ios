@@ -6,10 +6,17 @@ import 'tables/mercados_table.dart';
 import 'tables/registros_table.dart';
 import 'tables/listas_table.dart';
 import 'tables/itens_table.dart';
+import 'daos/produto_dao.dart';
+import 'daos/mercado_dao.dart';
+import 'daos/registro_dao.dart';
+import 'daos/lista_dao.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [Produtos, Mercados, RegistrosDePreco, ListasDeCompras, ItensDeLista])
+@DriftDatabase(
+  tables: [Produtos, Mercados, RegistrosDePreco, ListasDeCompras, ItensDeLista],
+  daos: [ProdutoDao, MercadoDao, RegistroDao, ListaDao],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 

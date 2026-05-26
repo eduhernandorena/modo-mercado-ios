@@ -2070,6 +2070,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     this,
   );
   late final $ItensDeListaTable itensDeLista = $ItensDeListaTable(this);
+  late final ProdutoDao produtoDao = ProdutoDao(this as AppDatabase);
+  late final MercadoDao mercadoDao = MercadoDao(this as AppDatabase);
+  late final RegistroDao registroDao = RegistroDao(this as AppDatabase);
+  late final ListaDao listaDao = ListaDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
