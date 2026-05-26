@@ -194,7 +194,7 @@ void main() {
           domain.ListaDeCompras(
             id: listaId,
             nome: 'Lista Teste',
-            itens: [],
+            itens: const [],
             criadoEm: _norm(DateTime.now()),
             atualizadoEm: _norm(DateTime.now()),
           ),
@@ -223,7 +223,7 @@ void main() {
         final original = domain.ListaDeCompras(
           id: uuid.v4(),
           nome: faker.lorem.sentence(),
-          itens: [],
+          itens: const [],
           criadoEm: _norm(faker.date.dateTime()),
           atualizadoEm: _norm(faker.date.dateTime()),
         );

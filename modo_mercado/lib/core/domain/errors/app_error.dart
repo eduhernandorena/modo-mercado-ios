@@ -2,6 +2,24 @@
 sealed class AppError implements Exception {
   const AppError();
 
+  // Factory constructors para uso nos use cases
+  const factory AppError.campoObrigatorioAusente(String campo) =
+      CampoObrigatorioAusenteError;
+  const factory AppError.valorInvalido(String campo, String motivo) =
+      ValorInvalidoError;
+  const factory AppError.produtoSemPreco(String nomeProduto) =
+      ProdutoSemPrecoError;
+  const factory AppError.falhaAoSalvar(String entidade, Object causa) =
+      FalhaAoSalvarError;
+  const factory AppError.falhaAoLer(String entidade, Object causa) =
+      FalhaAoLerError;
+  const factory AppError.falhaAoExcluir(String entidade, Object causa) =
+      FalhaAoExcluirError;
+  const factory AppError.dadosCorrempidos() = DadosCorrempidosError;
+  const factory AppError.produtoPossuiRegistros(String nomeProduto) =
+      ProdutoPossuiRegistrosError;
+  const factory AppError.listaVazia() = ListaVaziaError;
+
   String get mensagem;
   String? get sugestao => null;
 
