@@ -7,7 +7,7 @@ import 'package:modo_mercado/features/lista_de_compras/domain/use_cases/calcular
 import '../../helpers/test_factories.dart';
 
 void main() {
-  final calcular = const CalcularTotalUseCase();
+  const calcular = CalcularTotalUseCase();
   final random = Random();
 
   group('Property 7: Estimativa de total da lista de compras', () {
