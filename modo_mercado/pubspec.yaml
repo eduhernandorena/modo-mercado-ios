@@ -60,6 +60,7 @@ dev_dependencies:
   # Testes
   faker: ^2.1.0
   mocktail: ^1.0.4
+  sqlite3: ^2.9.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
