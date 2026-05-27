@@ -44,7 +44,7 @@ void main() {
     final lista = ListaDeCompras(
       id: 'l1',
       nome: 'Compras',
-      itens: [item1, item2, itemSemPreco],
+      itens: const [item1, item2, itemSemPreco],
       criadoEm: now,
       atualizadoEm: now,
     );
