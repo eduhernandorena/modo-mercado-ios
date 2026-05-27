@@ -1,2 +1,5 @@
 .worktrees/
 *.deb
+
+# Kiro MCP Manager - Sensitive configuration files
+.kiro/settings/

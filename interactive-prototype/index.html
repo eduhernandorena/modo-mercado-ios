@@ -1,0 +1,1837 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ModoMercado Protótipo</title>
+  <style>
+    /* ===== CSS RESET & BASE ===== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ===== iOS COLOR PALETTE ===== */
+    :root {
+      --ios-blue:       #007AFF;
+      --ios-green:      #34C759;
+      --ios-bg-primary: #F2F2F7;
+      --ios-bg-white:   #FFFFFF;
+      --ios-separator:  #C6C6C8;
+      --ios-text:       #000000;
+      --ios-text-sec:   #8E8E93;
+      --ios-shell-bg:   #E5E5EA;
+    }
+
+    /* ===== TYPOGRAPHY ===== */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", system-ui, sans-serif;
+      font-size: 17px;
+      font-weight: 400;
+      color: var(--ios-text);
+      background: var(--ios-shell-bg);
+    }
+
+    .text-large-title  { font-size: 34px; font-weight: 700; }
+    .text-nav-title    { font-size: 17px; font-weight: 600; }
+    .text-body         { font-size: 17px; font-weight: 400; }
+    .text-caption      { font-size: 12px; font-weight: 400; }
+
+    /* ===== PAGE LAYOUT ===== */
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    /* ===== iOS SHELL ===== */
+    #ios-shell {
+      position: relative;
+      width: 390px;
+      height: 844px;
+      background: var(--ios-bg-primary);
+      border-radius: 44px;
+      box-shadow:
+        0 0 0 2px #1C1C1E,
+        0 0 0 4px #3A3A3C,
+        0 20px 60px rgba(0, 0, 0, 0.5),
+        0 4px 16px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===== STATUS BAR ===== */
+    #status-bar {
+      flex-shrink: 0;
+      height: 44px;
+      background: var(--ios-bg-white);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 10;
+    }
+
+    #status-bar .time {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      color: var(--ios-text);
+    }
+
+    #status-bar .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    #status-bar .status-icons svg {
+      fill: var(--ios-text);
+    }
+
+    /* ===== SCREEN CONTAINER ===== */
+    #screen-container {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: var(--ios-bg-primary);
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    #screen-container::-webkit-scrollbar {
+      display: none;
+    }
+
+    /* ===== TAB BAR ===== */
+    #tab-bar {
+      flex-shrink: 0;
+      height: 83px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-top: 0.5px solid var(--ios-separator);
+      display: flex;
+      align-items: flex-start;
+      padding-top: 0;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Home indicator area (5px at bottom) */
+    #tab-bar::after {
+      content: '';
+      position: absolute;
+      bottom: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 134px;
+      height: 5px;
+      background: var(--ios-text);
+      border-radius: 3px;
+      opacity: 0.2;
+    }
+
+    .tab-item {
+      flex: 1;
+      height: 78px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      padding: 0;
+      color: var(--ios-text-sec);
+      transition: color 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .tab-item svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+    }
+
+    .tab-item .tab-label {
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 0.1px;
+      line-height: 1;
+    }
+
+    .tab-item.active {
+      color: var(--ios-blue);
+    }
+
+    .tab-item:active {
+      opacity: 0.6;
+    }
+
+    /* ===== RESPONSIVE: mobile (< 768px) ===== */
+    @media (max-width: 767px) {
+      body {
+        background: var(--ios-bg-primary);
+        align-items: flex-start;
+      }
+
+      #ios-shell {
+        width: 100%;
+        height: 100vh;
+        height: 100dvh;
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
+
+    /* ===== NAV BAR (placeholder styles for task 1.2) ===== */
+    .nav-bar {
+      height: 44px;
+      background: var(--ios-bg-white);
+      border-bottom: 0.5px solid var(--ios-separator);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .nav-bar .nav-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--ios-text);
+    }
+
+    .nav-bar .nav-action {
+      position: absolute;
+      right: 16px;
+      font-size: 17px;
+      font-weight: 400;
+      color: var(--ios-blue);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .nav-bar .nav-back {
+      position: absolute;
+      left: 8px;
+      font-size: 17px;
+      font-weight: 400;
+      color: var(--ios-blue);
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* ===== SCREEN PLACEHOLDER ===== */
+    .screen-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100%;
+      gap: 12px;
+      color: var(--ios-text-sec);
+    }
+
+    .screen-placeholder svg {
+      width: 48px;
+      height: 48px;
+      fill: var(--ios-text-sec);
+      opacity: 0.4;
+    }
+
+    .screen-placeholder p {
+      font-size: 17px;
+      font-weight: 400;
+    }
+
+    /* ===== LIST SECTIONS (iOS grouped style) ===== */
+    .list-section {
+      background: var(--ios-bg-primary);
+      padding: 0 16px 24px;
+    }
+
+    .list-section-header {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ios-text-sec);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 16px 4px 6px;
+    }
+
+    .list-group {
+      background: var(--ios-bg-white);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .list-item {
+      min-height: 44px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--ios-bg-white);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .list-item:active {
+      background: #E5E5EA;
+    }
+
+    .list-item + .list-item {
+      border-top: 1px solid var(--ios-separator);
+    }
+
+    .list-item-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .list-item-title {
+      font-size: 17px;
+      font-weight: 400;
+      color: var(--ios-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .list-item-subtitle {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ios-text-sec);
+    }
+
+    .list-item-value {
+      font-size: 17px;
+      font-weight: 400;
+      color: var(--ios-text-sec);
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .list-item-chevron {
+      width: 8px;
+      height: 13px;
+      fill: var(--ios-separator);
+      flex-shrink: 0;
+    }
+
+    /* ===== MODAL OVERLAY & BOTTOM SHEET ===== */
+    .modal-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .bottom-sheet {
+      background: var(--ios-bg-white);
+      border-radius: 16px 16px 0 0;
+      padding: 8px 16px 32px;
+      transform: translateY(100%);
+      transition: transform 300ms ease-out;
+      max-height: 80%;
+      overflow-y: auto;
+    }
+
+    .bottom-sheet.open {
+      transform: translateY(0);
+    }
+
+    .bottom-sheet-handle {
+      width: 40px;
+      height: 4px;
+      background: var(--ios-separator);
+      border-radius: 2px;
+      margin: 8px auto 16px;
+    }
+
+    .bottom-sheet-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--ios-text);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    /* ===== FORM ELEMENTS ===== */
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ios-text-sec);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .form-input,
+    .form-select {
+      width: 100%;
+      height: 44px;
+      background: var(--ios-bg-primary);
+      border: none;
+      border-radius: 10px;
+      padding: 0 12px;
+      font-family: inherit;
+      font-size: 17px;
+      font-weight: 400;
+      color: var(--ios-text);
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .form-input:focus,
+    .form-select:focus {
+      background: var(--ios-bg-white);
+      box-shadow: 0 0 0 2px var(--ios-blue);
+    }
+
+    .btn-cancel {
+      width: 100%;
+      height: 44px;
+      background: none;
+      border: none;
+      font-family: inherit;
+      font-size: 17px;
+      font-weight: 400;
+      color: var(--ios-blue);
+      cursor: pointer;
+      margin-top: 8px;
+      border-radius: 10px;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .btn-cancel:active {
+      opacity: 0.6;
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 32px;
+      gap: 12px;
+    }
+
+    .empty-state-icon {
+      width: 48px;
+      height: 48px;
+      fill: var(--ios-text-sec);
+      opacity: 0.4;
+    }
+
+    .empty-state-text {
+      font-size: 17px;
+      font-weight: 400;
+      color: var(--ios-text-sec);
+      text-align: center;
+    }
+
+    /* ===== LIST ITEM CHECKBOX & COMPLETED STATE ===== */
+    .item-checkbox {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      border: 2px solid var(--ios-separator);
+      background: transparent;
+      flex-shrink: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s ease, border-color 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .item-checkbox.checked {
+      background: var(--ios-blue);
+      border-color: var(--ios-blue);
+    }
+
+    .item-checkbox.checked::after {
+      content: '';
+      width: 6px;
+      height: 10px;
+      border: 2px solid #fff;
+      border-top: none;
+      border-left: none;
+      transform: rotate(45deg) translateY(-1px);
+    }
+
+    /* Completed item: entire content area gets opacity 0.4 and title gets line-through */
+    .item-concluido .list-item-content {
+      opacity: 0.4;
+    }
+
+    .item-concluido .list-item-title {
+      text-decoration: line-through;
+    }
+
+    .item-concluido .list-item-value {
+      opacity: 0.4;
+    }
+
+    /* ===== BOTTOM-SHEET ANIMATION KEYFRAMES ===== */
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to   { transform: translateY(0); }
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(0); }
+      to   { transform: translateY(100%); }
+    }
+
+    /* ===== NAV BAR BACK BUTTON CHEVRON ===== */
+    .nav-back-chevron {
+      width: 10px;
+      height: 16px;
+      fill: none;
+      stroke: var(--ios-blue);
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    /* ===== BADGE (e.g. "Melhor preço") ===== */
+    .badge-best-price {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      color: #fff;
+      background: var(--ios-green);
+      border-radius: 6px;
+      padding: 2px 7px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    /* ===== DASHBOARD CARDS ===== */
+    .dashboard-section {
+      padding: 0 16px 24px;
+    }
+
+    .dashboard-section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--ios-text);
+      padding: 16px 4px 10px;
+    }
+
+    .dashboard-card {
+      background: var(--ios-bg-white);
+      border-radius: 10px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .metrics-row {
+      display: flex;
+      justify-content: space-around;
+      gap: 8px;
+    }
+
+    .metric-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+    }
+
+    .metric-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--ios-blue);
+    }
+
+    .metric-label {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ios-text-sec);
+      text-align: center;
+    }
+
+    /* ===== COMPARACAO SELECT ===== */
+    .comparacao-select-wrapper {
+      padding: 12px 16px;
+      background: var(--ios-bg-primary);
+    }
+
+    .comparacao-select-wrapper .form-select {
+      background: var(--ios-bg-white);
+    }
+
+    /* ===== LISTA CARDS ===== */
+    .lista-card {
+      background: var(--ios-bg-white);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      cursor: pointer;
+    }
+
+    .lista-card:active {
+      opacity: 0.7;
+    }
+
+    .lista-card-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--ios-text);
+      margin-bottom: 4px;
+    }
+
+    .lista-card-meta {
+      font-size: 12px;
+      color: var(--ios-text-sec);
+    }
+
+    /* ===== DETALHE / RODAPÉ ===== */
+    .detail-section {
+      padding: 0 16px 24px;
+    }
+
+    .detail-row {
+      background: var(--ios-bg-white);
+      border-radius: 10px;
+      padding: 12px 16px;
+      margin-bottom: 8px;
+    }
+
+    .detail-label {
+      font-size: 12px;
+      font-weight: 400;
+      color: var(--ios-text-sec);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+    }
+
+    .detail-value {
+      font-size: 17px;
+      font-weight: 400;
+      color: var(--ios-text);
+    }
+
+    .lista-total-footer {
+      padding: 16px;
+      background: var(--ios-bg-white);
+      border-top: 0.5px solid var(--ios-separator);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .lista-total-label {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .lista-total-value {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--ios-blue);
+    }
+
+    .screen-with-footer {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+    }
+
+    .screen-with-footer .scroll-content {
+      flex: 1;
+    }
+
+    .recent-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 0.5px solid var(--ios-separator);
+    }
+
+    .recent-item:last-child {
+      border-bottom: none;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- iOS Shell -->
+  <div id="ios-shell">
+
+    <!-- Status Bar -->
+    <div id="status-bar">
+      <span class="time">9:41</span>
+      <div class="status-icons">
+        <!-- Signal bars -->
+        <svg width="17" height="12" viewBox="0 0 17 12" xmlns="http://www.w3.org/2000/svg" aria-label="Sinal">
+          <rect x="0"  y="7" width="3" height="5" rx="0.5"/>
+          <rect x="4"  y="5" width="3" height="7" rx="0.5"/>
+          <rect x="8"  y="3" width="3" height="9" rx="0.5"/>
+          <rect x="12" y="0" width="3" height="12" rx="0.5"/>
+        </svg>
+        <!-- Wi-Fi -->
+        <svg width="16" height="12" viewBox="0 0 16 12" xmlns="http://www.w3.org/2000/svg" aria-label="Wi-Fi">
+          <path d="M8 9.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3z"/>
+          <path d="M8 6C6.07 6 4.33 6.78 3.05 8.05L1.64 6.64A8.48 8.48 0 0 1 8 4c2.35 0 4.48.95 6.02 2.49l-1.41 1.41A6.48 6.48 0 0 0 8 6z"/>
+          <path d="M8 2C5.03 2 2.36 3.18.34 5.1L-.07 4.69 1.34 3.28A11.95 11.95 0 0 1 8 0c2.65 0 5.09.86 7.05 2.3l1.41 1.41-.41.41A11.95 11.95 0 0 0 8 2z" opacity="0.4"/>
+        </svg>
+        <!-- Battery -->
+        <svg width="25" height="12" viewBox="0 0 25 12" xmlns="http://www.w3.org/2000/svg" aria-label="Bateria">
+          <rect x="0" y="1" width="21" height="10" rx="2.5" stroke="currentColor" stroke-width="1" fill="none"/>
+          <rect x="22" y="4" width="2" height="4" rx="1"/>
+          <rect x="1.5" y="2.5" width="16" height="7" rx="1.5"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Screen Container -->
+    <div id="screen-container">
+      <!-- Content rendered by JS -->
+      <div class="screen-placeholder">
+        <p>Carregando…</p>
+      </div>
+    </div>
+
+
+    <!-- Tab Bar -->
+    <nav id="tab-bar" role="tablist" aria-label="Navegação principal">
+
+      <!-- Produtos -->
+      <button class="tab-item active" data-tab="produtos" role="tab" aria-selected="true" aria-label="Produtos">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6zm1.5 1.5h9L18 6H6l1.5-2.5zM5 8h14v12H5V8zm4 2v2H7v2h2v2h2v-2h2v-2h-2v-2H9z"/>
+        </svg>
+        <span class="tab-label">Produtos</span>
+      </button>
+
+      <!-- Registros -->
+      <button class="tab-item" data-tab="registros" role="tab" aria-selected="false" aria-label="Registros">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M21.41 11.58l-9-9A2 2 0 0 0 11 2H4a2 2 0 0 0-2 2v7a2 2 0 0 0 .59 1.42l9 9A2 2 0 0 0 13 22a2 2 0 0 0 1.41-.59l7-7A2 2 0 0 0 22 13a2 2 0 0 0-.59-1.42zM13 20.01L4 11V4h7l9 9-7 7.01zM6.5 5C7.33 5 8 5.67 8 6.5S7.33 8 6.5 8 5 7.33 5 6.5 5.67 5 6.5 5z"/>
+        </svg>
+        <span class="tab-label">Registros</span>
+      </button>
+
+      <!-- Listas -->
+      <button class="tab-item" data-tab="listas" role="tab" aria-selected="false" aria-label="Listas">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+        </svg>
+        <span class="tab-label">Listas</span>
+      </button>
+
+      <!-- Dashboard -->
+      <button class="tab-item" data-tab="dashboard" role="tab" aria-selected="false" aria-label="Dashboard">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M5 9.2h3V19H5V9.2zM10.6 5h2.8v14h-2.8V5zm5.6 8H19v6h-2.8v-6z"/>
+        </svg>
+        <span class="tab-label">Dashboard</span>
+      </button>
+
+      <!-- Comparação -->
+      <button class="tab-item" data-tab="comparacao" role="tab" aria-selected="false" aria-label="Comparação">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zm7.02-2H7v2h7.01v3L18 9l-3.99-4v3z"/>
+        </svg>
+        <span class="tab-label">Comparação</span>
+      </button>
+
+    </nav>
+
+  </div><!-- /#ios-shell -->
+
+  <script>
+    // ===== DATA LAYER =====
+    // mockData: objeto imutável com todos os dados simulados do protótipo.
+    // Datas nos registros são calculadas dinamicamente para sempre refletirem
+    // os últimos 30 dias a partir do momento em que a página é carregada.
+
+    const mockData = {
+
+      // ── Produtos ──────────────────────────────────────────────────────────
+      // 8+ produtos em 3 categorias: Laticínios, Hortifruti, Limpeza
+      produtos: [
+        // Laticínios
+        {
+          id: 'p1',
+          nome: 'Leite Integral',
+          categoria: 'Laticínios',
+          unidade: 'L',
+          marca: 'Italac',
+          observacao: 'Caixa longa vida 1L',
+          criadoEm: new Date(Date.now() - 60 * 86400000).toISOString()
+        },
+        {
+          id: 'p2',
+          nome: 'Queijo Mussarela',
+          categoria: 'Laticínios',
+          unidade: 'kg',
+          marca: 'Tirolez',
+          observacao: null,
+          criadoEm: new Date(Date.now() - 55 * 86400000).toISOString()
+        },
+        {
+          id: 'p3',
+          nome: 'Iogurte Natural',
+          categoria: 'Laticínios',
+          unidade: 'un',
+          marca: 'Danone',
+          observacao: 'Pote 170g',
+          criadoEm: new Date(Date.now() - 50 * 86400000).toISOString()
+        },
+        // Hortifruti
+        {
+          id: 'p4',
+          nome: 'Banana Prata',
+          categoria: 'Hortifruti',
+          unidade: 'kg',
+          marca: null,
+          observacao: 'Preferir pencas firmes',
+          criadoEm: new Date(Date.now() - 45 * 86400000).toISOString()
+        },
+        {
+          id: 'p5',
+          nome: 'Maçã Fuji',
+          categoria: 'Hortifruti',
+          unidade: 'kg',
+          marca: null,
+          observacao: null,
+          criadoEm: new Date(Date.now() - 40 * 86400000).toISOString()
+        },
+        {
+          id: 'p6',
+          nome: 'Tomate Italiano',
+          categoria: 'Hortifruti',
+          unidade: 'kg',
+          marca: null,
+          observacao: 'Evitar tomates muito maduros',
+          criadoEm: new Date(Date.now() - 35 * 86400000).toISOString()
+        },
+        // Limpeza
+        {
+          id: 'p7',
+          nome: 'Detergente Líquido',
+          categoria: 'Limpeza',
+          unidade: 'un',
+          marca: 'Ypê',
+          observacao: 'Frasco 500ml',
+          criadoEm: new Date(Date.now() - 30 * 86400000).toISOString()
+        },
+        {
+          id: 'p8',
+          nome: 'Sabão em Pó',
+          categoria: 'Limpeza',
+          unidade: 'cx',
+          marca: 'OMO',
+          observacao: 'Caixa 1kg',
+          criadoEm: new Date(Date.now() - 25 * 86400000).toISOString()
+        },
+        {
+          id: 'p9',
+          nome: 'Amaciante de Roupas',
+          categoria: 'Limpeza',
+          unidade: 'L',
+          marca: 'Comfort',
+          observacao: 'Frasco 2L',
+          criadoEm: new Date(Date.now() - 20 * 86400000).toISOString()
+        }
+      ],
+
+      // ── Mercados ──────────────────────────────────────────────────────────
+      mercados: [
+        {
+          id: 'm1',
+          nome: 'Supermercado Extra',
+          criadoEm: new Date(Date.now() - 90 * 86400000).toISOString()
+        },
+        {
+          id: 'm2',
+          nome: 'Atacadão',
+          criadoEm: new Date(Date.now() - 90 * 86400000).toISOString()
+        },
+        {
+          id: 'm3',
+          nome: 'Mercado Municipal',
+          criadoEm: new Date(Date.now() - 90 * 86400000).toISOString()
+        }
+      ],
+
+      // ── Registros de Preço ────────────────────────────────────────────────
+      // 12 registros cobrindo múltiplos produtos e mercados nos últimos 30 dias.
+      // Datas calculadas dinamicamente via Date.now() - N * 86400000.
+      registros: [
+        // Leite Integral (p1) nos 3 mercados
+        {
+          id: 'r1',
+          produtoId: 'p1',
+          mercadoId: 'm1',
+          valor: 5.49,
+          data: new Date(Date.now() - 2 * 86400000).toISOString(),
+          criadoEm: new Date(Date.now() - 2 * 86400000).toISOString()
+        },
+        {
+          id: 'r2',
+          produtoId: 'p1',
+          mercadoId: 'm2',
+          valor: 4.89,
+          data: new Date(Date.now() - 5 * 86400000).toISOString(),
+          criadoEm: new Date(Date.now() - 5 * 86400000).toISOString()
+        },
+        {
+          id: 'r3',
+          produtoId: 'p1',
+          mercadoId: 'm3',
+          valor: 5.20,
+          data: new Date(Date.now() - 1 * 86400000).toISOString(),
+          criadoEm: new Date(Date.now() - 1 * 86400000).toISOString()
+        },
+        // Queijo Mussarela (p2) em 2 mercados
+        {
+          id: 'r4',
+          produtoId: 'p2',
+          mercadoId: 'm1',
+          valor: 42.90,
+          data: new Date(Date.now() - 7 * 86400000).toISOString(),
+          criadoEm: new Date(Date.now() - 7 * 86400000).toISOString()
+        },
+        {
+          id: 'r5',
+          produtoId: 'p2',
+          mercadoId: 'm2',
+          valor: 38.50,
+          data: new Date(Date.now() - 10 * 86400000).toISOString(),
+          criadoEm: new Date(Date.now() - 10 * 86400000).toISOString()
+        },
+        // Banana Prata (p4) nos 3 mercados
+        {
+          id: 'r6',
+          produtoId: 'p4',
+          mercadoId: 'm1',
+          valor: 4.99,
+          data: new Date(Date.now() - 3 * 86400000).toISOString(),
+          criadoEm: new Date(Date.now() - 3 * 86400000).toISOString()
+        },
+        {
+          id: 'r7',
+          produtoId: 'p4',
+          mercadoId: 'm2',
+          valor: 3.79,
+          data: new Date(Date.now() - 8 * 86400000).toISOString(),
+          criadoEm: new Date(Date.now() - 8 * 86400000).toISOString()
+        },
+        {
+          id: 'r8',
+          produtoId: 'p4',
+          mercadoId: 'm3',
+          valor: 4.50,
+          data: new Date(Date.now() - 0 * 86400000).toISOString(),
+          criadoEm: new Date(Date.now() - 0 * 86400000).toISOString()
+        },
+        // Detergente Líquido (p7) em 2 mercados
+        {
+          id: 'r9',
+          produtoId: 'p7',
+          mercadoId: 'm1',
+          valor: 2.49,
+          data: new Date(Date.now() - 14 * 86400000).toISOString(),
+          criadoEm: new Date(Date.now() - 14 * 86400000).toISOString()
+        },
+        {
+          id: 'r10',
+          produtoId: 'p7',
+          mercadoId: 'm3',
+          valor: 2.19,
+          data: new Date(Date.now() - 20 * 86400000).toISOString(),
+          criadoEm: new Date(Date.now() - 20 * 86400000).toISOString()
+        },
+        // Sabão em Pó (p8) em 2 mercados
+        {
+          id: 'r11',
+          produtoId: 'p8',
+          mercadoId: 'm2',
+          valor: 18.90,
+          data: new Date(Date.now() - 15 * 86400000).toISOString(),
+          criadoEm: new Date(Date.now() - 15 * 86400000).toISOString()
+        },
+        // Tomate Italiano (p6) em 1 mercado
+        {
+          id: 'r12',
+          produtoId: 'p6',
+          mercadoId: 'm3',
+          valor: 7.80,
+          data: new Date(Date.now() - 4 * 86400000).toISOString(),
+          criadoEm: new Date(Date.now() - 4 * 86400000).toISOString()
+        }
+      ],
+
+      // ── Listas de Compras ─────────────────────────────────────────────────
+      // 2 listas ativas com 3–6 itens cada.
+      // ultimoPrecoRegistrado entre R$ 1,00 e R$ 50,00 (null em pelo menos 1 item por lista).
+      listas: [
+        {
+          id: 'l1',
+          nome: 'Compras da Semana',
+          ativa: true,
+          criadoEm: new Date(Date.now() - 3 * 86400000).toISOString(),
+          itens: [
+            {
+              id: 'i1',
+              produtoId: 'p1',
+              quantidade: 3,
+              concluido: false,
+              ultimoPrecoRegistrado: 5.20
+            },
+            {
+              id: 'i2',
+              produtoId: 'p4',
+              quantidade: 2,
+              concluido: false,
+              ultimoPrecoRegistrado: 4.50
+            },
+            {
+              id: 'i3',
+              produtoId: 'p7',
+              quantidade: 1,
+              concluido: false,
+              ultimoPrecoRegistrado: 2.19
+            },
+            {
+              id: 'i4',
+              produtoId: 'p6',
+              quantidade: 1,
+              concluido: false,
+              ultimoPrecoRegistrado: null  // sem preço registrado
+            }
+          ]
+        },
+        {
+          id: 'l2',
+          nome: 'Limpeza do Mês',
+          ativa: true,
+          criadoEm: new Date(Date.now() - 1 * 86400000).toISOString(),
+          itens: [
+            {
+              id: 'i5',
+              produtoId: 'p7',
+              quantidade: 2,
+              concluido: false,
+              ultimoPrecoRegistrado: 2.49
+            },
+            {
+              id: 'i6',
+              produtoId: 'p8',
+              quantidade: 1,
+              concluido: false,
+              ultimoPrecoRegistrado: 18.90
+            },
+            {
+              id: 'i7',
+              produtoId: 'p9',
+              quantidade: 1,
+              concluido: false,
+              ultimoPrecoRegistrado: 14.99
+            },
+            {
+              id: 'i8',
+              produtoId: 'p2',
+              quantidade: 1,
+              concluido: false,
+              ultimoPrecoRegistrado: null  // sem preço registrado
+            },
+            {
+              id: 'i9',
+              produtoId: 'p3',
+              quantidade: 4,
+              concluido: false,
+              ultimoPrecoRegistrado: 3.50
+            }
+          ]
+        }
+      ]
+
+    };
+
+    // ===== STATE LAYER =====
+    // appState: estado mutável da aplicação durante a sessão.
+    // Inicializado com cópias dos arrays de mockData para permitir mutações
+    // sem alterar os dados originais.
+
+    const appState = {
+      activeTab: 'produtos',
+      activeListaId: null,
+      activeProdutoId: null,
+      produtos:  [...mockData.produtos],
+      mercados:  [...mockData.mercados],
+      registros: [...mockData.registros],
+      listas:    mockData.listas.map(l => ({ ...l, itens: l.itens.map(i => ({ ...i })) }))
+    };
+
+    // ===== PURE BUSINESS LOGIC FUNCTIONS =====
+
+    /**
+     * Calcula o subtotal de um item de lista.
+     * Retorna ultimoPrecoRegistrado × quantidade, ou null se preço for nulo.
+     * @param {Object} item - ItemDeLista
+     * @returns {number|null}
+     */
+    function calcSubtotal(item) {
+      if (item.ultimoPrecoRegistrado === null || item.ultimoPrecoRegistrado === undefined) {
+        return null;
+      }
+      return item.ultimoPrecoRegistrado * item.quantidade;
+    }
+
+    /**
+     * Calcula o total estimado de uma lista somando os subtotais não-nulos.
+     * Itens sem preço registrado são ignorados (não afetam o total).
+     * @param {Object[]} itens - Array de ItemDeLista
+     * @returns {number}
+     */
+    function calcTotalLista(itens) {
+      return itens.reduce((acc, item) => {
+        const sub = calcSubtotal(item);
+        return sub !== null ? acc + sub : acc;
+      }, 0);
+    }
+
+    /**
+     * Ordena um array de registros de preço por data em ordem decrescente.
+     * Não muta o array original.
+     * @param {Object[]} registros - Array de RegistroDePreco
+     * @returns {Object[]}
+     */
+    function sortRegistrosByDateDesc(registros) {
+      return [...registros].sort((a, b) => new Date(b.data) - new Date(a.data));
+    }
+
+    /**
+     * Retorna o registro mais recente para um par produto+mercado específico.
+     * @param {Object[]} registros - Array de RegistroDePreco
+     * @param {string} produtoId
+     * @param {string} mercadoId
+     * @returns {Object|null}
+     */
+    function getUltimoRegistro(registros, produtoId, mercadoId) {
+      const filtrados = registros.filter(
+        r => r.produtoId === produtoId && r.mercadoId === mercadoId
+      );
+      if (filtrados.length === 0) return null;
+      return sortRegistrosByDateDesc(filtrados)[0];
+    }
+
+    /**
+     * Retorna o nome de um produto pelo seu ID.
+     * @param {Object[]} produtos - Array de Produto
+     * @param {string} id
+     * @returns {string}
+     */
+    function getNomeProduto(produtos, id) {
+      const produto = produtos.find(p => p.id === id);
+      return produto ? produto.nome : '(desconhecido)';
+    }
+
+    /**
+     * Retorna o nome de um mercado pelo seu ID.
+     * @param {Object[]} mercados - Array de Mercado
+     * @param {string} id
+     * @returns {string}
+     */
+    function getNomeMercado(mercados, id) {
+      const mercado = mercados.find(m => m.id === id);
+      return mercado ? mercado.nome : '(desconhecido)';
+    }
+
+    /**
+     * Agrupa produtos por categoria.
+     * Retorna um objeto Record<string, Produto[]> com chaves ordenadas alfabeticamente.
+     * @param {Object[]} produtos - Array de Produto
+     * @returns {Object}
+     */
+    function groupProdutosByCategoria(produtos) {
+      const grupos = {};
+      for (const produto of produtos) {
+        const cat = produto.categoria;
+        if (!grupos[cat]) grupos[cat] = [];
+        grupos[cat].push(produto);
+      }
+      // Recriar objeto com chaves ordenadas alfabeticamente
+      const chaves = Object.keys(grupos).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+      const resultado = {};
+      for (const chave of chaves) {
+        resultado[chave] = grupos[chave];
+      }
+      return resultado;
+    }
+
+    /**
+     * Retorna dados de comparação de preços para um produto em todos os mercados.
+     * Para cada mercado que possui pelo menos um registro do produto, retorna
+     * o mercado e seu último registro. O array é ordenado por valor crescente.
+     * @param {Object[]} registros - Array de RegistroDePreco
+     * @param {string} produtoId
+     * @param {Object[]} mercados - Array de Mercado
+     * @returns {Array<{mercado: Object, ultimoRegistro: Object}>}
+     */
+    function getComparacaoData(registros, produtoId, mercados) {
+      const resultado = [];
+      for (const mercado of mercados) {
+        const ultimo = getUltimoRegistro(registros, produtoId, mercado.id);
+        if (ultimo !== null) {
+          resultado.push({ mercado, ultimoRegistro: ultimo });
+        }
+      }
+      return resultado.sort((a, b) => a.ultimoRegistro.valor - b.ultimoRegistro.valor);
+    }
+
+    /**
+     * Formata um número como moeda BRL (Real Brasileiro).
+     * @param {number} valor
+     * @returns {string} ex: "R$ 5,49"
+     */
+    function formatBRL(valor) {
+      return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+    }
+
+    /**
+     * Formata uma string ISO 8601 como data no formato pt-BR.
+     * @param {string} isoString
+     * @returns {string} ex: "02/07/2025"
+     */
+    function formatData(isoString) {
+      return new Date(isoString).toLocaleDateString('pt-BR');
+    }
+
+    // ===== UI LAYER =====
+
+    const CHEVRON_SVG = '<svg class="list-item-chevron" viewBox="0 0 8 13" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M1 1l5 5.5L1 12"/></svg>';
+
+    function escapeHtml(text) {
+      if (text === null || text === undefined) return '';
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    /**
+     * Renderiza NavigationBar com título e ação opcional.
+     * @param {string} title
+     * @param {{ back?: boolean, action?: 'add' }} [options]
+     * @returns {string}
+     */
+    function renderNavBar(title, options = {}) {
+      const backBtn = options.back
+        ? `<button type="button" class="nav-back" id="nav-back" aria-label="Voltar">
+             <svg class="nav-back-chevron" viewBox="0 0 10 16" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+               <path d="M8 2L2 8l6 6"/>
+             </svg>
+             Voltar
+           </button>`
+        : '';
+
+      const actionBtn = options.action === 'add'
+        ? '<button type="button" class="nav-action" id="nav-action-add" aria-label="Adicionar">+</button>'
+        : '';
+
+      return `<header class="nav-bar">${backBtn}<span class="nav-title">${escapeHtml(title)}</span>${actionBtn}</header>`;
+    }
+
+    function showModal(htmlContent) {
+      hideModal(true);
+      const shell = document.getElementById('ios-shell');
+      const overlay = document.createElement('div');
+      overlay.className = 'modal-overlay';
+      overlay.innerHTML = `<div class="bottom-sheet">${htmlContent}</div>`;
+      shell.appendChild(overlay);
+
+      const sheet = overlay.querySelector('.bottom-sheet');
+      requestAnimationFrame(() => sheet.classList.add('open'));
+
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) hideModal();
+      });
+    }
+
+    function hideModal(immediate) {
+      const overlay = document.querySelector('.modal-overlay');
+      if (!overlay) return;
+      const sheet = overlay.querySelector('.bottom-sheet');
+      sheet.classList.remove('open');
+      const delay = immediate ? 0 : 300;
+      setTimeout(() => overlay.remove(), delay);
+    }
+
+    function renderProdutos() {
+      const container = document.getElementById('screen-container');
+
+      if (appState.produtos.length === 0) {
+        container.innerHTML = `
+          ${renderNavBar('Produtos', { action: 'add' })}
+          <div class="empty-state">
+            <svg class="empty-state-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4H6zm1.5 1.5h9L18 6H6l1.5-2.5zM5 8h14v12H5V8z"/>
+            </svg>
+            <p class="empty-state-text">Nenhum produto cadastrado</p>
+          </div>
+        `;
+        document.getElementById('nav-action-add')?.addEventListener('click', showNovoProdutoModal);
+        return;
+      }
+
+      const grupos = groupProdutosByCategoria(appState.produtos);
+      let sectionsHtml = '';
+
+      for (const [categoria, produtos] of Object.entries(grupos)) {
+        const itemsHtml = produtos.map(p => `
+          <div class="list-item" data-produto-id="${escapeHtml(p.id)}" role="button" tabindex="0">
+            <div class="list-item-content">
+              <span class="list-item-title">${escapeHtml(p.nome)}</span>
+              <span class="list-item-subtitle">${escapeHtml(p.categoria)} · ${escapeHtml(p.unidade)}</span>
+            </div>
+            ${CHEVRON_SVG}
+          </div>
+        `).join('');
+
+        sectionsHtml += `
+          <div class="list-section">
+            <div class="list-section-header">${escapeHtml(categoria)}</div>
+            <div class="list-group">${itemsHtml}</div>
+          </div>
+        `;
+      }
+
+      container.innerHTML = `${renderNavBar('Produtos', { action: 'add' })}${sectionsHtml}`;
+
+      document.getElementById('nav-action-add')?.addEventListener('click', showNovoProdutoModal);
+      container.querySelectorAll('[data-produto-id]').forEach(el => {
+        el.addEventListener('click', () => {
+          appState.activeProdutoId = el.dataset.produtoId;
+          renderScreen();
+        });
+      });
+    }
+
+    function renderDetalheProduto(produtoId) {
+      const container = document.getElementById('screen-container');
+      const produto = appState.produtos.find(p => p.id === produtoId);
+
+      if (!produto) {
+        appState.activeProdutoId = null;
+        renderProdutos();
+        return;
+      }
+
+      container.innerHTML = `
+        ${renderNavBar(produto.nome, { back: true })}
+        <div class="detail-section">
+          <div class="detail-row">
+            <div class="detail-label">Nome</div>
+            <div class="detail-value">${escapeHtml(produto.nome)}</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-label">Categoria</div>
+            <div class="detail-value">${escapeHtml(produto.categoria)}</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-label">Unidade</div>
+            <div class="detail-value">${escapeHtml(produto.unidade)}</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-label">Marca</div>
+            <div class="detail-value">${escapeHtml(produto.marca || '—')}</div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-label">Observação</div>
+            <div class="detail-value">${escapeHtml(produto.observacao || '—')}</div>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('nav-back')?.addEventListener('click', () => {
+        appState.activeProdutoId = null;
+        renderScreen();
+      });
+    }
+
+    function showNovoProdutoModal() {
+      showModal(`
+        <div class="bottom-sheet-handle"></div>
+        <div class="bottom-sheet-title">Novo Produto</div>
+        <div class="form-group">
+          <label class="form-label" for="prod-nome">Nome</label>
+          <input class="form-input" id="prod-nome" type="text" placeholder="Nome do produto" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="prod-categoria">Categoria</label>
+          <input class="form-input" id="prod-categoria" type="text" placeholder="Ex: Laticínios" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="prod-unidade">Unidade</label>
+          <input class="form-input" id="prod-unidade" type="text" placeholder="Ex: kg, L, un" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="prod-marca">Marca</label>
+          <input class="form-input" id="prod-marca" type="text" placeholder="Opcional" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="prod-obs">Observação</label>
+          <input class="form-input" id="prod-obs" type="text" placeholder="Opcional" />
+        </div>
+        <button type="button" class="btn-cancel" id="modal-cancel">Cancelar</button>
+      `);
+      document.getElementById('modal-cancel')?.addEventListener('click', () => hideModal());
+    }
+
+    function renderRegistros() {
+      const container = document.getElementById('screen-container');
+      const registros = sortRegistrosByDateDesc(appState.registros);
+
+      if (registros.length === 0) {
+        container.innerHTML = `
+          ${renderNavBar('Registros', { action: 'add' })}
+          <div class="empty-state">
+            <svg class="empty-state-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M21.41 11.58l-9-9A2 2 0 0 0 11 2H4a2 2 0 0 0-2 2v7a2 2 0 0 0 .59 1.42l9 9A2 2 0 0 0 13 22a2 2 0 0 0 1.41-.59l7-7A2 2 0 0 0 22 13a2 2 0 0 0-.59-1.42z"/>
+            </svg>
+            <p class="empty-state-text">Nenhum registro de preço</p>
+          </div>
+        `;
+        document.getElementById('nav-action-add')?.addEventListener('click', showNovoRegistroModal);
+        return;
+      }
+
+      const itemsHtml = registros.map(r => {
+        const nomeProduto = getNomeProduto(appState.produtos, r.produtoId);
+        const nomeMercado = getNomeMercado(appState.mercados, r.mercadoId);
+        return `
+          <div class="list-item">
+            <div class="list-item-content">
+              <span class="list-item-title">${escapeHtml(nomeProduto)}</span>
+              <span class="list-item-subtitle">${escapeHtml(nomeMercado)} · ${formatData(r.data)}</span>
+            </div>
+            <span class="list-item-value">${formatBRL(r.valor)}</span>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = `
+        ${renderNavBar('Registros', { action: 'add' })}
+        <div class="list-section">
+          <div class="list-group">${itemsHtml}</div>
+        </div>
+      `;
+
+      document.getElementById('nav-action-add')?.addEventListener('click', showNovoRegistroModal);
+    }
+
+    function showNovoRegistroModal() {
+      const produtoOptions = appState.produtos.map(p =>
+        `<option value="${escapeHtml(p.id)}">${escapeHtml(p.nome)}</option>`
+      ).join('');
+      const mercadoOptions = appState.mercados.map(m =>
+        `<option value="${escapeHtml(m.id)}">${escapeHtml(m.nome)}</option>`
+      ).join('');
+
+      showModal(`
+        <div class="bottom-sheet-handle"></div>
+        <div class="bottom-sheet-title">Novo Registro</div>
+        <div class="form-group">
+          <label class="form-label" for="reg-produto">Produto</label>
+          <select class="form-select" id="reg-produto">${produtoOptions}</select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="reg-mercado">Mercado</label>
+          <select class="form-select" id="reg-mercado">${mercadoOptions}</select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="reg-valor">Valor (R$)</label>
+          <input class="form-input" id="reg-valor" type="number" step="0.01" min="0" placeholder="0,00" />
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="reg-data">Data</label>
+          <input class="form-input" id="reg-data" type="date" />
+        </div>
+        <button type="button" class="btn-cancel" id="modal-cancel">Cancelar</button>
+      `);
+      document.getElementById('modal-cancel')?.addEventListener('click', () => hideModal());
+    }
+
+    function renderListas() {
+      const container = document.getElementById('screen-container');
+
+      if (appState.listas.length === 0) {
+        container.innerHTML = `
+          ${renderNavBar('Listas de Compras', { action: 'add' })}
+          <div class="empty-state">
+            <svg class="empty-state-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/>
+            </svg>
+            <p class="empty-state-text">Nenhuma lista criada</p>
+          </div>
+        `;
+        document.getElementById('nav-action-add')?.addEventListener('click', showNovaListaModal);
+        return;
+      }
+
+      const cardsHtml = appState.listas.map(lista => {
+        const total = calcTotalLista(lista.itens);
+        return `
+          <div class="lista-card" data-lista-id="${escapeHtml(lista.id)}" role="button" tabindex="0">
+            <div class="lista-card-title">${escapeHtml(lista.nome)}</div>
+            <div class="lista-card-meta">${lista.itens.length} itens · Total estimado: ${formatBRL(total)}</div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = `
+        ${renderNavBar('Listas de Compras', { action: 'add' })}
+        <div class="list-section">${cardsHtml}</div>
+      `;
+
+      document.getElementById('nav-action-add')?.addEventListener('click', showNovaListaModal);
+      container.querySelectorAll('[data-lista-id]').forEach(el => {
+        el.addEventListener('click', () => {
+          appState.activeListaId = el.dataset.listaId;
+          renderScreen();
+        });
+      });
+    }
+
+    function showNovaListaModal() {
+      showModal(`
+        <div class="bottom-sheet-handle"></div>
+        <div class="bottom-sheet-title">Nova Lista</div>
+        <div class="form-group">
+          <label class="form-label" for="lista-nome">Nome</label>
+          <input class="form-input" id="lista-nome" type="text" placeholder="Nome da lista" />
+        </div>
+        <button type="button" class="btn-cancel" id="modal-cancel">Cancelar</button>
+      `);
+      document.getElementById('modal-cancel')?.addEventListener('click', () => hideModal());
+    }
+
+    function renderDetalheLista(listaId) {
+      const container = document.getElementById('screen-container');
+      const lista = appState.listas.find(l => l.id === listaId);
+
+      if (!lista) {
+        appState.activeListaId = null;
+        renderListas();
+        return;
+      }
+
+      const itemsHtml = lista.itens.map(item => {
+        const nomeProduto = getNomeProduto(appState.produtos, item.produtoId);
+        const subtotal = calcSubtotal(item);
+        const subtotalText = subtotal !== null ? formatBRL(subtotal) : '—';
+        const concluidoClass = item.concluido ? ' checked' : '';
+        const itemClass = item.concluido ? ' item-concluido' : '';
+
+        return `
+          <div class="list-item${itemClass}" data-item-id="${escapeHtml(item.id)}">
+            <button type="button" class="item-checkbox${concluidoClass}" data-item-id="${escapeHtml(item.id)}" aria-label="Marcar item"></button>
+            <div class="list-item-content">
+              <span class="list-item-title">${escapeHtml(nomeProduto)}</span>
+              <span class="list-item-subtitle">Qtd: ${item.quantidade}</span>
+            </div>
+            <span class="list-item-value">${subtotalText}</span>
+          </div>
+        `;
+      }).join('');
+
+      const total = calcTotalLista(lista.itens);
+
+      container.innerHTML = `
+        <div class="screen-with-footer">
+          ${renderNavBar(lista.nome, { back: true })}
+          <div class="scroll-content">
+            <div class="list-section">
+              <div class="list-group">${itemsHtml}</div>
+            </div>
+          </div>
+          <div class="lista-total-footer">
+            <span class="lista-total-label">Total estimado</span>
+            <span class="lista-total-value" id="lista-total-value">${formatBRL(total)}</span>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('nav-back')?.addEventListener('click', () => {
+        appState.activeListaId = null;
+        renderScreen();
+      });
+
+      container.querySelectorAll('.item-checkbox').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const itemId = btn.dataset.itemId;
+          const item = lista.itens.find(i => i.id === itemId);
+          if (!item) return;
+
+          item.concluido = !item.concluido;
+          const row = btn.closest('.list-item');
+          btn.classList.toggle('checked', item.concluido);
+          row.classList.toggle('item-concluido', item.concluido);
+
+          const novoTotal = calcTotalLista(lista.itens);
+          const totalEl = document.getElementById('lista-total-value');
+          if (totalEl) totalEl.textContent = formatBRL(novoTotal);
+        });
+      });
+    }
+
+    function renderDashboard() {
+      const container = document.getElementById('screen-container');
+      const ultimosRegistros = sortRegistrosByDateDesc(appState.registros).slice(0, 3);
+      const listasAtivas = appState.listas.filter(l => l.ativa);
+      const somaListasAtivas = listasAtivas.reduce((acc, l) => acc + calcTotalLista(l.itens), 0);
+
+      const recentesHtml = ultimosRegistros.length > 0
+        ? ultimosRegistros.map(r => `
+            <div class="recent-item">
+              <div>
+                <div class="list-item-title">${escapeHtml(getNomeProduto(appState.produtos, r.produtoId))}</div>
+                <div class="list-item-subtitle">${escapeHtml(getNomeMercado(appState.mercados, r.mercadoId))}</div>
+              </div>
+              <span class="list-item-value">${formatBRL(r.valor)}</span>
+            </div>
+          `).join('')
+        : '<p class="empty-state-text">Nenhum registro</p>';
+
+      container.innerHTML = `
+        ${renderNavBar('Dashboard')}
+        <div class="dashboard-section">
+          <div class="dashboard-card">
+            <div class="metrics-row">
+              <div class="metric-item">
+                <span class="metric-value">${appState.produtos.length}</span>
+                <span class="metric-label">Produtos</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">${appState.mercados.length}</span>
+                <span class="metric-label">Mercados</span>
+              </div>
+              <div class="metric-item">
+                <span class="metric-value">${appState.registros.length}</span>
+                <span class="metric-label">Registros</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="dashboard-section">
+          <div class="dashboard-section-title">Últimos Registros</div>
+          <div class="dashboard-card">${recentesHtml}</div>
+        </div>
+        <div class="dashboard-section">
+          <div class="dashboard-section-title">Listas Ativas</div>
+          <div class="dashboard-card">
+            <div class="list-item-title">${listasAtivas.length} listas ativas</div>
+            <div class="list-item-subtitle" style="margin-top: 6px;">Total estimado: ${formatBRL(somaListasAtivas)}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderComparacaoLista(produtoId) {
+      const listContainer = document.getElementById('comparacao-list');
+      if (!listContainer) return;
+
+      const dados = getComparacaoData(appState.registros, produtoId, appState.mercados);
+
+      if (dados.length === 0) {
+        listContainer.innerHTML = `
+          <div class="empty-state">
+            <p class="empty-state-text">Sem registros de preço para este produto</p>
+          </div>
+        `;
+        return;
+      }
+
+      const itemsHtml = dados.map((item, index) => {
+        const badge = index === 0 ? '<span class="badge-best-price">Melhor preço</span>' : '';
+        return `
+          <div class="list-item">
+            <div class="list-item-content">
+              <span class="list-item-title">${escapeHtml(item.mercado.nome)}</span>
+              <span class="list-item-subtitle">${formatData(item.ultimoRegistro.data)}</span>
+            </div>
+            <span class="list-item-value">${formatBRL(item.ultimoRegistro.valor)}</span>
+            ${badge}
+          </div>
+        `;
+      }).join('');
+
+      listContainer.innerHTML = `<div class="list-group">${itemsHtml}</div>`;
+    }
+
+    function renderComparacao() {
+      const container = document.getElementById('screen-container');
+
+      if (appState.produtos.length === 0) {
+        container.innerHTML = `
+          ${renderNavBar('Comparação')}
+          <div class="empty-state">
+            <p class="empty-state-text">Nenhum produto cadastrado</p>
+          </div>
+        `;
+        return;
+      }
+
+      const optionsHtml = appState.produtos.map(p =>
+        `<option value="${escapeHtml(p.id)}">${escapeHtml(p.nome)}</option>`
+      ).join('');
+      const defaultProdutoId = appState.produtos[0].id;
+
+      container.innerHTML = `
+        ${renderNavBar('Comparação')}
+        <div class="comparacao-select-wrapper">
+          <select class="form-select" id="comparacao-produto" aria-label="Selecionar produto">${optionsHtml}</select>
+        </div>
+        <div class="list-section" id="comparacao-list"></div>
+      `;
+
+      const select = document.getElementById('comparacao-produto');
+      select.value = defaultProdutoId;
+      renderComparacaoLista(defaultProdutoId);
+
+      select.addEventListener('change', () => {
+        renderComparacaoLista(select.value);
+      });
+    }
+
+    // ===== APP CONTROLLER =====
+
+    /**
+     * Renderiza a tela correspondente à aba ativa e ao estado atual.
+     * Despacha para a função render*() correta com base em appState.activeTab
+     * e appState.activeListaId. Se a função de render ainda não estiver
+     * implementada, exibe um placeholder com o nome da tela.
+     */
+    function renderScreen() {
+      const container = document.getElementById('screen-container');
+
+      if (appState.activeTab === 'produtos' && appState.activeProdutoId !== null) {
+        renderDetalheProduto(appState.activeProdutoId);
+        return;
+      }
+
+      // Detalhe de lista tem prioridade sobre a aba "listas"
+      if (appState.activeTab === 'listas' && appState.activeListaId !== null) {
+        renderDetalheLista(appState.activeListaId);
+        return;
+      }
+
+      const renderMap = {
+        produtos:   renderProdutos,
+        registros:  renderRegistros,
+        listas:     renderListas,
+        dashboard:  renderDashboard,
+        comparacao: renderComparacao,
+      };
+
+      const renderFn = renderMap[appState.activeTab];
+      if (renderFn) {
+        renderFn();
+      } else {
+        container.innerHTML = _placeholderHTML(appState.activeTab);
+      }
+    }
+
+    /**
+     * Gera HTML de placeholder para telas ainda não implementadas.
+     * @param {string} screenName - Nome legível da tela
+     * @returns {string} HTML string
+     */
+    function _placeholderHTML(screenName) {
+      return `
+        <div class="screen-placeholder">
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+          </svg>
+          <p>${screenName}</p>
+        </div>
+      `;
+    }
+
+    /**
+     * Ativa uma aba da TabBar.
+     * Atualiza appState.activeTab, aplica/remove a classe .active nos .tab-item
+     * e chama renderScreen() para exibir a tela correspondente.
+     * @param {string} tabName - Valor do atributo data-tab da aba a ativar
+     */
+    function setActiveTab(tabName) {
+      appState.activeTab = tabName;
+      appState.activeListaId = null;
+      appState.activeProdutoId = null;
+
+      // Atualiza classes e atributos ARIA nos botões da TabBar
+      document.querySelectorAll('.tab-item').forEach(btn => {
+        const isActive = btn.dataset.tab === tabName;
+        btn.classList.toggle('active', isActive);
+        btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      });
+
+      renderScreen();
+    }
+
+    // ===== INITIALIZATION =====
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Adiciona event listeners de clique em todos os .tab-item
+      document.querySelectorAll('.tab-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+          setActiveTab(btn.dataset.tab);
+        });
+      });
+
+      // Renderiza a tela inicial (aba "Produtos" já está marcada como .active no HTML)
+      renderScreen();
+    });
+
+  </script>
+
+</body>
+</html>

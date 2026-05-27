@@ -20,21 +20,21 @@ void main() {
   });
 
   test('ListaDeCompras calcula totalEstimadoCentavos corretamente', () {
-    final item1 = ItemDeLista(
+    const item1 = ItemDeLista(
       id: 'i1',
       produtoId: 'p1',
       quantidade: 2.0,
       concluido: false,
       ultimoPrecoRegistradoCentavos: 1000,
     );
-    final item2 = ItemDeLista(
+    const item2 = ItemDeLista(
       id: 'i2',
       produtoId: 'p2',
       quantidade: 3.0,
       concluido: true,
       ultimoPrecoRegistradoCentavos: 500,
     );
-    final itemSemPreco = ItemDeLista(
+    const itemSemPreco = ItemDeLista(
       id: 'i3',
       produtoId: 'p3',
       quantidade: 1.0,
